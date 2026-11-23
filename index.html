@@ -1,0 +1,818 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sarap & Giggles</title>
+<style>
+:root {
+  --bg:#fff8ef;
+  --card:#ffffff;
+  --ink:#38271f;
+  --muted:#806d60;
+  --brown:#75452e;
+  --orange:#e99a51;
+  --cream:#f9e9d5;
+  --green:#39744c;
+  --red:#b94236;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:Arial,sans-serif;
+}
+header{
+  background:var(--brown);color:white;text-align:center;
+  padding:30px 16px;
+}
+header h1{margin:0;font-size:34px}
+header p{margin:9px 0 0;color:#ffe7d0}
+nav{
+  display:flex;justify-content:center;gap:10px;
+  padding:14px;flex-wrap:wrap;background:#fff;
+}
+button{
+  border:0;border-radius:10px;padding:12px 17px;
+  background:var(--brown);color:white;font-weight:bold;
+  cursor:pointer;
+}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.secondary{background:var(--cream);color:var(--ink)}
+button.danger{background:var(--red)}
+button.green{background:var(--green)}
+main{max-width:850px;margin:24px auto;padding:0 14px}
+.card{
+  background:var(--card);padding:20px;margin-bottom:17px;
+  border-radius:15px;box-shadow:0 3px 13px #75452e12;
+}
+h2{margin-top:0}
+.muted{color:var(--muted);font-size:14px}
+.product{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;padding:15px 0;border-bottom:1px solid #eee;
+}
+.product:last-child{border:0}
+.product h3{margin:0 0 5px}
+.product p{margin:0;color:var(--muted);font-size:14px}
+.quantity{width:72px;padding:10px;border:1px solid #ddd;border-radius:8px}
+input,select,textarea{
+  width:100%;padding:12px;border:1px solid #ddd;
+  border-radius:9px;margin:6px 0 14px;font-size:15px;
+  background:white;color:var(--ink);
+}
+label{font-weight:bold;font-size:14px}
+.total{font-size:23px;font-weight:bold;color:var(--brown)}
+.notice{
+  padding:13px;border-radius:10px;background:var(--cream);
+  margin:12px 0;
+}
+.hidden{display:none!important}
+.status{
+  display:inline-block;padding:5px 9px;border-radius:20px;
+  background:var(--cream);font-size:12px;font-weight:bold;
+}
+.order{border:1px solid #eee;padding:14px;border-radius:11px;margin:12px 0}
+.order h3{margin:0 0 7px}
+.order small{color:var(--muted)}
+.order-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.order-actions select{width:auto;margin:0}
+footer{text-align:center;padding:30px;color:var(--muted)}
+hr{border:0;border-top:1px solid #eee;margin:18px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🥟 Sarap & Giggles</h1>
+  <p>Homemade Filipino favorites made with love!</p>
+</header>
+
+<nav>
+  <button onclick="showPage('menu')">Order Food</button>
+  <button class="secondary" onclick="showPage('admin')">Administrator</button>
+</nav>
+
+<main>
+
+<section id="menuPage">
+  <div class="card">
+    <h2>Our Menu</h2>
+    <p class="muted">Fresh homemade favorites. Pickup orders only.</p>
+    <div id="closedNotice" class="notice hidden">
+      <strong>We're currently not accepting orders.</strong>
+      Please check back later!
+    </div>
+
+    <div class="product">
+      <div>
+        <h3>Cooked Lumpia</h3>
+        <p>25 pieces · $35.00</p>
+      </div>
+      <input class="quantity" type="number" min="0" max="50"
+        value="0" id="cookedQty" aria-label="Cooked Lumpia quantity">
+    </div>
+
+    <div class="product">
+      <div>
+        <h3>Frozen Lumpia</h3>
+        <p>25 pieces · $30.00</p>
+      </div>
+      <input class="quantity" type="number" min="0" max="50"
+        value="0" id="frozenQty" aria-label="Frozen Lumpia quantity">
+    </div>
+
+    <div class="product">
+      <div>
+        <h3>Pancit</h3>
+        <p>Good for 1–2 people · $15.00</p>
+      </div>
+      <input class="quantity" type="number" min="0" max="50"
+        value="0" id="pancitQty" aria-label="Pancit quantity">
+    </div>
+
+    <div class="product">
+      <div>
+        <h3>Pancit Combo</h3>
+        <p>Pancit with 3 lumpia · $20.00</p>
+      </div>
+      <input class="quantity" type="number" min="0" max="50"
+        value="0" id="comboQty" aria-label="Pancit Combo quantity">
+    </div>
+    <hr>
+    <div class="total">Total: <span id="total">$0.00</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Pickup Information</h2>
+    <label for="customerName">Your Name</label>
+    <input id="customerName" maxlength="80" placeholder="Enter your name">
+
+    <label for="pickupDate">Pickup Date</label>
+    <input id="pickupDate" type="date">
+
+    <label for="pickupTime">Pickup Time</label>
+    <select id="pickupTime">
+      <option value="">Choose a pickup time</option>
+    </select>
+
+    <label for="notes">Special Instructions (Optional)</label>
+    <textarea id="notes" rows="3" maxlength="500"
+      placeholder="Anything we should know?"></textarea>
+
+    <button class="green" id="reviewButton" onclick="reviewOrder()">
+      Review My Order
+    </button>
+  </div>
+
+  <div class="card hidden" id="reviewSection">
+    <h2>Review Your Order</h2>
+    <div id="reviewDetails"></div>
+    <div class="notice">
+      Please check your order and pickup information before confirming.
+    </div>
+    <button class="green" id="confirmButton" onclick="submitOrder()">
+      Confirm Order
+    </button>
+    <button class="secondary" onclick="hideReview()">Go Back</button>
+  </div>
+
+  <div class="card hidden" id="successSection">
+    <h2>🎉 Thank You!</h2>
+    <p>Your order has been submitted successfully.</p>
+    <p id="confirmationNumber"></p>
+    <p>We look forward to preparing your order!</p>
+    <button onclick="newOrder()">Place Another Order</button>
+  </div>
+</section>
+
+<section id="adminPage" class="hidden">
+  <div class="card" id="loginSection">
+    <h2>Administrator Login</h2>
+    <p class="muted">Authorized administrators only.</p>
+    <label for="adminEmail">Administrator Email</label>
+    <input id="adminEmail" type="email" autocomplete="username">
+    <label for="adminPassword">Password</label>
+    <input id="adminPassword" type="password"
+      autocomplete="current-password">
+    <button onclick="adminLogin()">Log In</button>
+    <p id="loginMessage" class="muted"></p>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <div class="card">
+      <h2>Administrator Dashboard</h2>
+      <p>Welcome to Sarap & Giggles management.</p>
+      <div class="notice">
+        <strong>Order Acceptance:</strong>
+        <span id="acceptanceStatus">Loading...</span>
+      </div>
+      <button id="toggleOrdersButton" onclick="toggleOrders()">
+        Close Orders
+      </button>
+      <button class="secondary" onclick="adminLogout()">Log Out</button>
+    </div>
+
+    <div class="card">
+      <h2>Order Overview</h2>
+      <div class="total" id="orderCount">0 Orders</div>
+      <p>Total sales: <strong id="salesTotal">$0.00</strong></p>
+      <p class="muted">Sales are calculated from submitted orders.</p>
+    </div>
+
+    <div class="card">
+      <h2>Find Orders</h2>
+      <input id="searchOrders" placeholder="Search customer or order number"
+        oninput="renderOrders()">
+      <label for="filterDate">Filter by Pickup Date</label>
+      <input id="filterDate" type="date" onchange="renderOrders()">
+      <button class="secondary" onclick="clearFilters()">Clear Filters</button>
+    </div>
+
+    <div class="card">
+      <h2>Order Calendar</h2>
+      <label for="calendarDate">Choose a date</label>
+      <input id="calendarDate" type="date" onchange="calendarOrders()">
+      <div id="calendarResults"></div>
+    </div>
+
+    <div class="card">
+      <h2>All Orders & Order History</h2>
+      <div id="ordersList">Loading orders...</div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <strong>Sarap & Giggles</strong>
+  <p>Thank you for supporting our homemade food!</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+<script>
+// ==================================================
+// 1. FIREBASE CONFIGURATION
+// Replace these values with your Firebase project details.
+// ==================================================
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCchu0Wgbc65TljGcndclMNvx21weK-xec",
+  authDomain: "sarap-giggles.firebaseapp.com",
+  projectId: "sarap-giggles",
+  storageBucket: "sarap-giggles.firebasestorage.app",
+  messagingSenderId: "270498861136",
+  appId: "1:270498861136:web:e78137cd9207e556384155",
+  measurementId: "G-ZF6FPNSCG6"
+};
+
+// Replace with your administrator's Firebase Authentication UID.
+const ADMIN_UIDS = [
+  "gvgqZXXA7rZQ1mHpqs1uWaZwgdm1",
+  "uPg1HAGt95XCl8Py315cQRa9vx52"
+];
+// ==================================================
+// 2. INITIALIZATION
+// ==================================================
+
+let db = null;
+let auth = null;
+let currentUser = null;
+let isAdmin = false;
+let acceptingOrders = false;
+let orders = [];
+let settingsListener = null;
+let ordersListener = null;
+
+const prices = {
+  cooked: 35,
+  frozen: 30,
+  pancit: 15,
+  combo: 20
+};
+
+const productNames = {
+  cooked: "Cooked Lumpia (25 pieces)",
+  frozen: "Frozen Lumpia (25 pieces)",
+  pancit: "Pancit",
+  combo: "Pancit Combo"
+};
+
+let firebaseReady = false;
+
+try {
+  if (firebaseConfig.apiKey === "YOUR_API_KEY" ||
+      firebaseConfig.projectId === "YOUR_PROJECT_ID") {
+    throw new Error("Firebase configuration is incomplete.");
+  }
+
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  firebaseReady = true;
+
+  auth.onAuthStateChanged(user => {
+    currentUser = user;
+    isAdmin = !!user && ADMIN_UIDS.includes(user.uid);
+
+    if (isAdmin) {
+      showDashboard();
+    } else {
+      document.getElementById("dashboard").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
+      stopAdminListeners();
+    }
+  });
+
+  listenToSettings();
+
+} catch (error) {
+  console.error(error);
+  document.getElementById("closedNotice").classList.remove("hidden");
+  document.getElementById("closedNotice").textContent =
+    "The ordering system is not configured yet. Please check back later.";
+}
+
+// ==================================================
+// 3. PAGE NAVIGATION
+// ==================================================
+
+function showPage(page) {
+  document.getElementById("menuPage").classList.toggle("hidden", page !== "menu");
+  document.getElementById("adminPage").classList.toggle("hidden", page !== "admin");
+}
+
+// ==================================================
+// 4. PICKUP TIMES
+// ==================================================
+
+const timeSelect = document.getElementById("pickupTime");
+
+for (let hour = 10; hour <= 18; hour++) {
+  for (let minute of [0, 30]) {
+    if (hour === 18 && minute === 30) continue;
+
+    const option = document.createElement("option");
+    const displayHour = hour > 12 ? hour - 12 : hour;
+    const suffix = hour >= 12 ? "PM" : "AM";
+    const displayMinute = minute === 0 ? "00" : "30";
+    option.value = `${String(hour).padStart(2,"0")}:${displayMinute}`;
+    option.textContent = `${displayHour}:${displayMinute} ${suffix}`;
+    timeSelect.appendChild(option);
+  }
+}
+
+const today = new Date();
+const localToday = [
+  today.getFullYear(),
+  String(today.getMonth()+1).padStart(2,"0"),
+  String(today.getDate()).padStart(2,"0")
+].join("-");
+
+document.getElementById("pickupDate").min = localToday;
+
+// ==================================================
+// 5. ORDER TOTAL
+// ==================================================
+
+function getQuantities() {
+  return {
+    cooked: Number(document.getElementById("cookedQty").value) || 0,
+    frozen: Number(document.getElementById("frozenQty").value) || 0,
+    pancit: Number(document.getElementById("pancitQty").value) || 0,
+    combo: Number(document.getElementById("comboQty").value) || 0
+  };
+}
+
+function calculateTotal(q) {
+  return Object.keys(prices).reduce(
+    (sum, key) => sum + prices[key] * q[key], 0
+  );
+}
+
+function money(value) {
+  return "$" + Number(value).toFixed(2);
+}
+
+function updateTotal() {
+  const q = getQuantities();
+  document.getElementById("total").textContent =
+    money(calculateTotal(q));
+}
+
+["cookedQty","frozenQty","pancitQty","comboQty"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => {
+    const el = document.getElementById(id);
+    el.value = Math.min(50, Math.max(0, Number(el.value) || 0));
+    updateTotal();
+    hideReview();
+  });
+});
+
+// ==================================================
+// 6. REVIEW ORDER
+// ==================================================
+
+let reviewedOrder = null;
+
+function reviewOrder() {
+  if (!firebaseReady) {
+    alert("The ordering system is not configured yet.");
+    return;
+  }
+
+  if (!acceptingOrders) {
+    alert("We are currently not accepting orders.");
+    return;
+  }
+
+  const q = getQuantities();
+  const items = Object.keys(q).filter(key => q[key] > 0);
+
+  if (!items.length) {
+    alert("Please select at least one menu item.");
+    return;
+  }
+
+  if (items.some(key => !Number.isInteger(q[key]) || q[key] < 1 || q[key] > 50)) {
+    alert("Please enter valid item quantities.");
+    return;
+  }
+
+  const name = document.getElementById("customerName").value.trim();
+  const date = document.getElementById("pickupDate").value;
+  const time = document.getElementById("pickupTime").value;
+  const notes = document.getElementById("notes").value.trim();
+
+  if (!name) {
+    alert("Please enter your name.");
+    return;
+  }
+
+  if (!date || date < localToday) {
+    alert("Please choose a valid pickup date.");
+    return;
+  }
+
+  if (!time) {
+    alert("Please select a pickup time.");
+    return;
+  }
+
+  const total = calculateTotal(q);
+
+  reviewedOrder = {name, date, time, notes, q, total};
+
+  let html = `<p><strong>Name:</strong> ${escapeHTML(name)}</p>
+    <p><strong>Pickup:</strong> ${escapeHTML(date)} at ${escapeHTML(time)}</p><hr>`;
+
+  items.forEach(key => {
+    html += `<p>${escapeHTML(productNames[key])} × ${q[key]} —
+      ${money(prices[key] * q[key])}</p>`;
+  });
+
+  html += `<hr><p><strong>Total: ${money(total)}</strong></p>`;
+
+  if (notes) {
+    html += `<p><strong>Instructions:</strong> ${escapeHTML(notes)}</p>`;
+  }
+
+  document.getElementById("reviewDetails").innerHTML = html;
+  document.getElementById("reviewSection").classList.remove("hidden");
+  document.getElementById("successSection").classList.add("hidden");
+  document.getElementById("reviewSection").scrollIntoView({behavior:"smooth"});
+}
+
+function hideReview() {
+  reviewedOrder = null;
+  document.getElementById("reviewSection").classList.add("hidden");
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[char]);
+}
+
+// ==================================================
+// 7. SUBMIT ORDER
+// ==================================================
+
+async function submitOrder() {
+  if (!firebaseReady || !reviewedOrder || !acceptingOrders) {
+    alert("Unable to submit order. Please try again.");
+    return;
+  }
+
+  const button = document.getElementById("confirmButton");
+  button.disabled = true;
+  button.textContent = "Submitting...";
+
+  try {
+    const q = reviewedOrder.q;
+    const items = Object.keys(q)
+      .filter(key => q[key] > 0)
+      .map(key => ({
+        name: productNames[key],
+        quantity: q[key],
+        unitPrice: prices[key],
+        subtotal: prices[key] * q[key]
+      }));
+
+    const doc = await db.collection("orders").add({
+      customerName: reviewedOrder.name,
+      pickupDate: reviewedOrder.date,
+      pickupTime: reviewedOrder.time,
+      notes: reviewedOrder.notes,
+      items,
+      total: reviewedOrder.total,
+      status: "Review",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    document.getElementById("reviewSection").classList.add("hidden");
+    document.getElementById("successSection").classList.remove("hidden");
+    document.getElementById("confirmationNumber").textContent =
+      "Order number: " + doc.id;
+
+    reviewedOrder = null;
+    document.getElementById("successSection").scrollIntoView({behavior:"smooth"});
+
+  } catch (error) {
+    console.error(error);
+    alert("We couldn't submit your order. Please try again later.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Confirm Order";
+  }
+}
+
+function newOrder() {
+  ["cookedQty","frozenQty","pancitQty","comboQty"].forEach(id => {
+    document.getElementById(id).value = 0;
+  });
+
+  document.getElementById("customerName").value = "";
+  document.getElementById("pickupDate").value = "";
+  document.getElementById("pickupTime").value = "";
+  document.getElementById("notes").value = "";
+
+  document.getElementById("successSection").classList.add("hidden");
+  updateTotal();
+}
+
+// ==================================================
+// 8. ORDER ACCEPTANCE SETTINGS
+// ==================================================
+
+function listenToSettings() {
+  if (!db) return;
+
+  settingsListener = db.collection("settings").doc("store").onSnapshot(doc => {
+    acceptingOrders = doc.exists && doc.data().acceptingOrders === true;
+
+    document.getElementById("closedNotice").classList.toggle(
+      "hidden", acceptingOrders
+    );
+
+    document.getElementById("reviewButton").disabled = !acceptingOrders;
+
+    if (!acceptingOrders) {
+      hideReview();
+    }
+
+    updateAcceptanceDisplay();
+  }, error => {
+    console.error(error);
+    acceptingOrders = false;
+    document.getElementById("closedNotice").classList.remove("hidden");
+    document.getElementById("closedNotice").textContent =
+      "Ordering is temporarily unavailable.";
+    document.getElementById("reviewButton").disabled = true;
+  });
+}
+
+function updateAcceptanceDisplay() {
+  document.getElementById("acceptanceStatus").textContent =
+    acceptingOrders ? "OPEN" : "CLOSED";
+
+  document.getElementById("toggleOrdersButton").textContent =
+    acceptingOrders ? "Close Orders" : "Reopen Orders";
+}
+
+async function toggleOrders() {
+  if (!isAdmin) return;
+
+  try {
+    await db.collection("settings").doc("store").set({
+      acceptingOrders: !acceptingOrders,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, {merge:true});
+  } catch (error) {
+    alert("Unable to update order acceptance.");
+    console.error(error);
+  }
+}
+
+// ==================================================
+// 9. ADMIN LOGIN
+// ==================================================
+
+async function adminLogin() {
+  if (!firebaseReady) {
+    alert("Firebase has not been configured.");
+    return;
+  }
+
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value;
+
+  if (!email || !password) {
+    document.getElementById("loginMessage").textContent =
+      "Enter your email and password.";
+    return;
+  }
+
+  try {
+    const result = await auth.signInWithEmailAndPassword(email, password);
+
+    if (result.user.uid !== ADMIN_UID) {
+      await auth.signOut();
+      document.getElementById("loginMessage").textContent =
+        "This account is not authorized as an administrator.";
+      return;
+    }
+
+    document.getElementById("loginMessage").textContent = "";
+  } catch (error) {
+    document.getElementById("loginMessage").textContent =
+      "Login failed. Check your email and password.";
+  }
+}
+
+async function adminLogout() {
+  if (auth) await auth.signOut();
+}
+
+function showDashboard() {
+  document.getElementById("loginSection").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  startAdminListeners();
+}
+
+function stopAdminListeners() {
+  if (ordersListener) {
+    ordersListener();
+    ordersListener = null;
+  }
+}
+
+// ==================================================
+// 10. ADMIN ORDER DASHBOARD
+// ==================================================
+
+function startAdminListeners() {
+  if (!db || !isAdmin || ordersListener) return;
+
+  ordersListener = db.collection("orders")
+    .orderBy("createdAt", "desc")
+    .onSnapshot(snapshot => {
+      orders = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      renderOrders();
+      updateStatistics();
+      calendarOrders();
+    }, error => {
+      console.error(error);
+      document.getElementById("ordersList").textContent =
+        "Unable to load orders. Check your Firestore security rules.";
+    });
+}
+
+function updateStatistics() {
+  document.getElementById("orderCount").textContent =
+    `${orders.length} Orders`;
+
+  const sales = orders.reduce((sum, order) =>
+    sum + (Number(order.total) || 0), 0);
+
+  document.getElementById("salesTotal").textContent = money(sales);
+}
+
+function renderOrders() {
+  if (!isAdmin) return;
+
+  const search = document.getElementById("searchOrders").value
+    .trim().toLowerCase();
+
+  const date = document.getElementById("filterDate").value;
+
+  const filtered = orders.filter(order => {
+    const name = (order.customerName || "").toLowerCase();
+    const id = order.id.toLowerCase();
+
+    return (!search || name.includes(search) || id.includes(search)) &&
+      (!date || order.pickupDate === date);
+  });
+
+  const container = document.getElementById("ordersList");
+
+  if (!filtered.length) {
+    container.innerHTML = "<p class='muted'>No matching orders found.</p>";
+    return;
+  }
+
+  container.innerHTML = filtered.map(order => {
+    const items = (order.items || []).map(item =>
+      `<li>${escapeHTML(item.name)} × ${Number(item.quantity)} —
+      ${money(item.subtotal)}</li>`
+    ).join("");
+
+    return `
+      <div class="order">
+        <h3>${escapeHTML(order.customerName || "Customer")}</h3>
+        <small>Order: ${escapeHTML(order.id)}</small>
+        <p><strong>Pickup:</strong>
+          ${escapeHTML(order.pickupDate || "")} at
+          ${escapeHTML(order.pickupTime || "")}</p>
+        <ul>${items}</ul>
+        <p><strong>Total:</strong> ${money(order.total)}</p>
+        ${order.notes ? `<p><strong>Notes:</strong> ${escapeHTML(order.notes)}</p>` : ""}
+        <p><span class="status">${escapeHTML(order.status || "Review")}</span></p>
+        <div class="order-actions">
+          <select id="status-${order.id}">
+            ${["Review","Accepted","Being Prepared","Ready for Pickup","Picked Up","Cancelled"]
+              .map(status => `<option value="${status}" ${order.status === status ? "selected" : ""}>${status}</option>`).join("")}
+          </select>
+          <button onclick="updateOrderStatus('${order.id}')">Save Status</button>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+async function updateOrderStatus(id) {
+  if (!isAdmin) return;
+
+  const select = document.getElementById("status-" + id);
+  if (!select) return;
+
+  try {
+    await db.collection("orders").doc(id).update({
+      status: select.value,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (error) {
+    alert("Unable to update order status.");
+    console.error(error);
+  }
+}
+
+function clearFilters() {
+  document.getElementById("searchOrders").value = "";
+  document.getElementById("filterDate").value = "";
+  renderOrders();
+}
+
+function calendarOrders() {
+  if (!isAdmin) return;
+
+  const date = document.getElementById("calendarDate").value;
+  const container = document.getElementById("calendarResults");
+
+  if (!date) {
+    container.innerHTML = "<p class='muted'>Select a date to view its orders.</p>";
+    return;
+  }
+
+  const dayOrders = orders.filter(order => order.pickupDate === date);
+
+  if (!dayOrders.length) {
+    container.innerHTML = "<p class='muted'>No orders for this date.</p>";
+    return;
+  }
+
+  container.innerHTML = dayOrders.map(order =>
+    `<div class="notice">
+      <strong>${escapeHTML(order.pickupTime || "")}</strong> —
+      ${escapeHTML(order.customerName || "")}<br>
+      ${money(order.total)} · ${escapeHTML(order.status || "Review")}
+    </div>`
+  ).join("");
+}
+
+// ==================================================
+// 11. INITIAL DISPLAY
+// ==================================================
+
+updateTotal();
+updateAcceptanceDisplay();
+</script>
+</body>
+</html>
